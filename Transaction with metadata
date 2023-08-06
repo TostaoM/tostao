@@ -1,0 +1,55 @@
+import { Blockfrost, Lucid, Tx } from "https://deno.land/x/lucid@0.10.1/mod.ts";
+
+const wallets = [
+  // Add the paths to the wallet private key files here
+  "./wallets/Tostao1101.sk",
+  // Add more wallet paths if needed
+];
+
+async function sendTransactionFromWallet(privateKeyPath: string) {
+  const lucid = await Lucid.new(
+    new Blockfrost(
+      "https://cardano-mainnet.blockfrost.io/api/v0",
+      "mainnetBFLQewPEEXwa74qT0kItFUiPKHA0Tfxl",
+    ),
+    "Mainnet",
+  );
+
+  lucid.selectWalletFromPrivateKey(await Deno.readTextFile(privateKeyPath));
+
+  const metadata = "mamamia"; // Use a simple string as metadata
+
+  try {
+    const expirationTime = Date.now() + 10800 * 1000; // Set TTL to 1 hour from now
+    const tx: Tx = await lucid.newTx()
+      .payToAddress("addr1qycvq797prl6m39p3y287xcu2j05tnnhusrcyf7aq3nl3y2hlpx5nss4msg5e3zhwd6rh2qxkeh6zjmnna8yt69qkurqvk0qtm", { lovelace: 1000000n })
+      .attachMetadata(674, metadata)
+      .validTo(new Date(expirationTime)) // Set the validTo property with the expiration date
+      .complete();
+
+    const signedTx = await tx.sign().complete();
+
+    const txHash = await signedTx.submit();
+    console.log(`Transaction from ${privateKeyPath} submitted. TxHash:`, txHash);
+  } catch (error) {
+    if (error.message) {
+      console.error(`Error sending transaction from ${privateKeyPath}: ${error.message}`);
+    } else {
+      console.error(`Error sending transaction from ${privateKeyPath}:`, error);
+    }
+  }
+}
+
+async function main() {
+  try {
+    // Create an array of promises for sending transactions from all wallets concurrently
+    const promises = wallets.map(sendTransactionFromWallet);
+
+    // Use Promise.all to wait for all transactions to complete
+    await Promise.all(promises);
+  } catch (error) {
+    console.error(`Error sending transactions:`, error.message);
+  }
+}
+
+await main();
