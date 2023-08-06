@@ -5,7 +5,7 @@ async function performSwap() {
   const lucid = await Lucid.new(
     new Blockfrost(
       "https://cardano-mainnet.blockfrost.io/api/v0",
-      "mainnetBFLQewPEEXwa74qT0kIiPKHA0Tfxl",
+      "mainnetBFLQewPEEXwa74qT0kItFUiPKHA0Tfxl",
     ),
     "Mainnet",
   );
@@ -24,7 +24,7 @@ async function performSwap() {
   const paymentCredentialHash = paymentCredential?.hash;
 
   // Replace undefined with your known stake credential hash
-  const stakeCredentialHash = "a8bda3e68eb5a7255baebfa4e302ba48b69eff5de72e81259d5f";
+  const stakeCredentialHash = "a8bda3e68eb5a7255baeb8f36fa4e302ba48b69eff5de72e81259d5f";
 
   console.log("Payment Credential Hash:", paymentCredentialHash);
   console.log("Stake Credential Hash:", stakeCredentialHash);
@@ -48,12 +48,13 @@ async function performSwap() {
       new Constr(0,[new Constr(0,[paymentCredentialHash]), // pubKey Of Receiver Wallet
         new Constr(0,[new Constr(0,[new Constr(0, [stakeCredentialHash])])])]), // StakeKey Of Receiver Wallet
       new Constr(1,[]),
-      new Constr(0,[new Constr(0,["29d222ce763455e3d7a09a665ce554f00ac89d2e99a1a83d267170c6", "4d494e"]), 
+      new Constr(0,[new Constr(0,["300c2737ba4297e9bb29b5bcf8e61bc9c2c94ad4a01bd052e4c6aa3c", "546f7374616f"]), 
         BigInt(28090730)]), 
       BigInt(2000000), // batcherFee
       BigInt(2000000), // deposit
     ])
   );
+
 
   try {
     // Create a new transaction
