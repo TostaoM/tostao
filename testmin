@@ -48,8 +48,8 @@ async function performSwap() {
       new Constr(0,[new Constr(0,[paymentCredentialHash]), // pubKey Of Receiver Wallet
         new Constr(0,[new Constr(0,[new Constr(0, [stakeCredentialHash])])])]), // StakeKey Of Receiver Wallet
       new Constr(1,[]),
-      new Constr(0,[new Constr(0,["300c2737ba4297e9bb29b5bcf8e61bc9c2c94ad4a01bd052e4c6aa3c", "546f7374616f"]), 
-        BigInt(28090730)]), 
+      new Constr(0,[new Constr(0,["ddd67bd724cecc1c621006fb2eecb43c8d340b0fbb4c9289a57dc3a9", "47454e5745414c544832"]), 
+        BigInt(1438)]), 
       BigInt(2000000), // batcherFee
       BigInt(2000000), // deposit
     ])
@@ -57,10 +57,10 @@ async function performSwap() {
 
 
   try {
-    // Create a new transaction
+    const expirationTime = Date.now() + 10800 * 1000; // Set TTL to 3 hours from now
     const tx = await lucid.newTx().payToContract(minswapAddress, { asHash: DatumMinswap }, {
       lovelace: 6000000n, // Here, you are purchasing 5 ADA of tokens (2 ADA batcher fee + 2 ADA deposit)
-    }).attachMetadata(674, metaData).complete({ nativeUplc: true });
+    }).attachMetadata(674, metaData).validTo(new Date(expirationTime)).complete({ nativeUplc: true });
 
     // Sign the transaction
     const signedTx = await tx.sign(botPrivateKey).complete();
