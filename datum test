@@ -36,7 +36,7 @@ async function performSwap() {
   }
 
   // The MinSwap contract address
-  const CONTRACTAddress = "addr1qycvq797prl6m39p3y287xcu2j05tnnhusrcyf7aq3nl3y2hlpx5nss4msg5e3zhwd6rh2qxkeh6zjmnna8yt69qkurqvk0qtm"; // Replace with the MinSwap contract address
+  const CONTRACTAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with the MinSwap contract address
 
   // Construct the Datumswap object
   const Datumcswap = Data.to(
