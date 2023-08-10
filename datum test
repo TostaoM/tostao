@@ -39,7 +39,7 @@ async function performSwap() {
   const CONTRACTAddress = "YOUR_CONTRACT_ADDRESS"; // Replace with the MinSwap contract address
 
   // Construct the Datumswap object
-  const Datumcswap = Data.to(
+  const Datumswap = Data.to(
     new Constr(0,[
       new Constr(0,[new Constr(0,[new Constr(0,[paymentCredentialHash]), // pubKey Of Sender Wallet
         new Constr(0,[new Constr(0,[new Constr(0, [stakeCredentialHash])])])]), // StakeKey Of Sender Wallet
@@ -49,11 +49,17 @@ async function performSwap() {
       new Constr(1,[]),
       new Constr(1,[]),
       BigInt(0), 
-      "fec7dfa59902eb40f65a62812662769962d5662f2a6bc2804b829881","4865724d6f6e737465727347616e6730393934", BigInt(1),
-      [],
-      []
+      new Map([["", new Map([["", BigInt(1202490)]])], // Corrected Map creation
+        [
+          "fec7dfa59902eb40f65a62812662769962d5662f2a6bc2804b829881",
+          new Map([["4865724d6f6e737465727347616e6730393934", BigInt(1)]])
+        ]
+      ]), // Corrected Map creation
+      new Map([["", new Map([["", BigInt(0)]])]]),
+      new Map([["", new Map([["", BigInt(0)]])]]),
     ])]),
   );
+
 
   try {
     const expirationTime = Date.now() + 10800 * 1000; // Set TTL to 3 hours from now
