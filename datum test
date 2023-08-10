@@ -1,0 +1,76 @@
+import { Blockfrost, Lucid, Data, Constr } from "https://deno.land/x/lucid@0.8.3/mod.ts";
+import { ConstrPlutusData, DataHash } from "https://deno.land/x/lucid@0.8.3/src/core/wasm_modules/cardano_multiplatform_lib_nodejs/cardano_multiplatform_lib.js";
+
+async function performSwap() {
+  // Initialize Lucid with Blockfrost API
+  const lucid = await Lucid.new(
+    new Blockfrost(
+      "https://cardano-mainnet.blockfrost.io/api/v0",
+      "YOUR_BLOCKFROST_API",
+    ),
+    "Mainnet",
+  );
+
+  // Replace with the path to the bot's private key file
+  const botPrivateKeyFilePath = "./wallets/Tostao1101.sk";
+  // Read the bot's private key from the file
+  const botPrivateKey = await Deno.readTextFile(botPrivateKeyFilePath);
+
+  // Import the bot wallet using the private key
+  const wallet = await lucid.selectWalletFromPrivateKey(botPrivateKey);
+
+  // Get the paymentCredential hash from the wallet address
+  const walletAddress = await lucid.wallet.address();
+  const { paymentCredential } = lucid.utils.getAddressDetails(walletAddress);
+  const paymentCredentialHash = paymentCredential?.hash;
+
+  // Replace undefined with your known stake credential hash
+  const stakeCredentialHash = "YOUR_STAKECREDENTIALHASH";
+
+  console.log("Payment Credential Hash:", paymentCredentialHash);
+  console.log("Stake Credential Hash:", stakeCredentialHash);
+
+  if (!paymentCredentialHash || !stakeCredentialHash) {
+    console.error("Could not retrieve paymentCredential and/or stakeCredential hashes.");
+    return;
+  }
+
+  // The MinSwap contract address
+  const CONTRACTAddress = "addr1qycvq797prl6m39p3y287xcu2j05tnnhusrcyf7aq3nl3y2hlpx5nss4msg5e3zhwd6rh2qxkeh6zjmnna8yt69qkurqvk0qtm"; // Replace with the MinSwap contract address
+
+  // Construct the Datumswap object
+  const Datumcswap = Data.to(
+    new Constr(0,[
+      new Constr(0,[new Constr(0,[new Constr(0,[paymentCredentialHash]), // pubKey Of Sender Wallet
+        new Constr(0,[new Constr(0,[new Constr(0, [stakeCredentialHash])])])]), // StakeKey Of Sender Wallet
+      [paymentCredentialHash], // pubKey Of Receiver Wallet
+      new Constr(0,[]),
+      new Constr(0,[]),
+      new Constr(1,[]),
+      new Constr(1,[]),
+      BigInt(0), 
+      "fec7dfa59902eb40f65a62812662769962d5662f2a6bc2804b829881","4865724d6f6e737465727347616e6730393934", BigInt(1),
+      [],
+      []
+    ])]),
+  );
+
+  try {
+    const expirationTime = Date.now() + 10800 * 1000; // Set TTL to 3 hours from now
+    const tx = await lucid.newTx().payToContract(cswapAddress, { asHash: Datumswap }, {
+      lovelace: 1000000n, // Here, you are purchasing 5 ADA of tokens (2 ADA batcher fee + 2 ADA deposit)
+    }).validTo(new Date(expirationTime)).complete({ nativeUplc: true });
+
+    // Sign the transaction
+    const signedTx = await tx.sign(botPrivateKey).complete();
+
+    // Submit the transaction
+    const txHash = await signedTx.submit();
+    console.log("Transaction submitted. TxHash:", txHash);
+  } catch (error) {
+    console.error("Error occurred:", error);
+  }
+}
+
+// Run the function
+performSwap();
